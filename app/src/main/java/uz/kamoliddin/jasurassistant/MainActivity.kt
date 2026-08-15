@@ -6,7 +6,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.speech.RecognitionService
+import android.provider.Settings
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
@@ -39,7 +39,13 @@ class MainActivity : AppCompatActivity() {
 
     private val assistantRoleLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { updateStatus() }
+    ) {
+        updateStatus()
+        if (!isJasurActiveAssistant()) {
+            openDefaultAppsSettings()
+            toast("Default apps ichidan 'Digital assistant app' ni ochib Jasur Assistant ni tanlang")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,17 +107,17 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.stopButton).setOnClickListener {
             if (!isJasurActiveAssistant()) {
                 toast("Avval Jasurni standart yordamchi sifatida tanlang")
-                requestAssistantRole()
+                openDefaultAppsSettings()
                 return@setOnClickListener
             }
             try {
                 startActivity(Intent(Intent.ACTION_ASSIST))
             } catch (_: Exception) {
-                toast("Power tugmasini bosib ushlab Jasurni chaqirib ko‘ring")
+                startActivity(Intent(this, AssistActivity::class.java))
             }
         }
         findViewById<Button>(R.id.permissionsButton).setOnClickListener { requestRuntimePermissions() }
-        findViewById<Button>(R.id.callRoleButton).setOnClickListener { requestAssistantRole() }
+        findViewById<Button>(R.id.callRoleButton).setOnClickListener { openDefaultAppsSettings() }
         findViewById<Button>(R.id.notificationAccessButton).setOnClickListener {
             toast("System Assistant rejimida doimiy notification kerak emas")
         }
@@ -126,16 +132,27 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestAssistantRole() {
         val roleManager = getSystemService(RoleManager::class.java)
-        if (!roleManager.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) {
-            toast("Bu Android qurilmada Assistant roli mavjud emas")
-            return
-        }
-        if (roleManager.isRoleHeld(RoleManager.ROLE_ASSISTANT)) {
+        if (isJasurActiveAssistant()) {
             toast("Jasur allaqachon standart yordamchi")
             updateStatus()
             return
         }
-        assistantRoleLauncher.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT))
+        if (roleManager.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) {
+            try {
+                assistantRoleLauncher.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT))
+                return
+            } catch (_: Exception) { }
+        }
+        openDefaultAppsSettings()
+        toast("Default apps → Digital assistant app → Jasur Assistant ni tanlang")
+    }
+
+    private fun openDefaultAppsSettings() {
+        try {
+            startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
+        } catch (_: Exception) {
+            startActivity(Intent(Settings.ACTION_SETTINGS))
+        }
     }
 
     private fun requestRuntimePermissions() {
@@ -174,11 +191,15 @@ class MainActivity : AppCompatActivity() {
         statusDetails.text = if (active) {
             "$mic • $contacts • $camera\nNotification yo‘q. Power/assistant gesture bilan Jasurni chaqiring."
         } else {
-            "$mic • $contacts • $camera\n“Ishga tushirish” orqali Jasurni standart yordamchi qiling."
+            "$mic • $contacts • $camera\nSamsung: Default apps → Digital assistant app → Jasur Assistant"
         }
     }
 
     private fun isJasurActiveAssistant(): Boolean {
+        val roleManager = getSystemService(RoleManager::class.java)
+        if (roleManager.isRoleAvailable(RoleManager.ROLE_ASSISTANT) && roleManager.isRoleHeld(RoleManager.ROLE_ASSISTANT)) {
+            return true
+        }
         val component = ComponentName(this, JasurVoiceInteractionService::class.java)
         return VoiceInteractionService.isActiveService(this, component)
     }
