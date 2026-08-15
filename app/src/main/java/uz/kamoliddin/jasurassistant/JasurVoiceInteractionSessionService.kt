@@ -1,0 +1,11 @@
+package uz.kamoliddin.jasurassistant
+
+import android.os.Bundle
+import android.service.voice.VoiceInteractionSession
+import android.service.voice.VoiceInteractionSessionService
+
+class JasurVoiceInteractionSessionService : VoiceInteractionSessionService() {
+    override fun onNewSession(args: Bundle?): VoiceInteractionSession {
+        return JasurVoiceInteractionSession(this)
+    }
+}
