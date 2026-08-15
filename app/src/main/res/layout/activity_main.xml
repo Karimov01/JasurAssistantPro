@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="18dp"
-            android:text="Shaxsiy ovozli AI yordamchi"
+            android:text="Shaxsiy System AI Assistant"
             android:textColor="@color/jasur_muted"
             android:textSize="15sp" />
 
@@ -37,7 +37,7 @@
                 android:id="@+id/statusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="● To‘xtatilgan"
+                android:text="● Assistant sifatida tanlanmagan"
                 android:textColor="@color/jasur_muted"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -47,30 +47,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:text="Jasur hozir tinglamayapti"
+                android:text="Jasurni Android standart yordamchisi qilib tanlang"
                 android:textColor="@color/jasur_muted" />
 
-            <LinearLayout
+            <Button
+                android:id="@+id/startButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="14dp"
-                android:orientation="horizontal">
+                android:text="JASURNI STANDART YORDAMCHI QILISH" />
 
-                <Button
-                    android:id="@+id/startButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Ishga tushirish" />
-
-                <Button
-                    android:id="@+id/stopButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:text="To‘xtatish" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/stopButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="JASURNI SINASH" />
         </LinearLayout>
 
         <TextView
@@ -110,7 +101,7 @@
                 android:id="@+id/offlineSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Offline tanishni birinchi tanlash"
+                android:text="Imkon bo‘lsa on-device/offline tanish"
                 android:textColor="@color/jasur_text" />
 
             <Switch
@@ -124,14 +115,14 @@
                 android:id="@+id/callAnnounceSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Kiruvchi qo‘ng‘iroqlarni ovozli aytish"
+                android:text="Kiruvchi qo‘ng‘iroqlarni ovozli aytish (keyingi bosqich)"
                 android:textColor="@color/jasur_text" />
 
             <Switch
                 android:id="@+id/telegramSwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Telegram notification xabarlarini saqlash/o‘qish"
+                android:text="Telegram xabarlarini o‘qish (keyingi bosqich)"
                 android:textColor="@color/jasur_text" />
         </LinearLayout>
 
@@ -195,7 +186,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="22dp"
-            android:text="RUXSATLAR"
+            android:text="RUXSATLAR VA SYSTEM ASSISTANT"
             android:textColor="@color/jasur_muted"
             android:textStyle="bold" />
 
@@ -210,25 +201,25 @@
                 android:id="@+id/permissionsButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Mikrofon / Kontakt / Qo‘ng‘iroq ruxsatlari" />
+                android:text="Mikrofon / Kontakt / Fonar ruxsatlari" />
 
             <Button
                 android:id="@+id/callRoleButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Caller ID / Call Screening rolini yoqish" />
+                android:text="ANDROID ASSISTANT ROLINI TANLASH" />
 
             <Button
                 android:id="@+id/notificationAccessButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Telegram uchun Notification Access" />
+                android:text="Notification kerak emas" />
 
             <Button
                 android:id="@+id/batteryButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Battery optimization sozlamasi" />
+                android:text="Batareya: System Assistant rejimi" />
         </LinearLayout>
 
         <TextView
@@ -236,7 +227,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:layout_marginBottom="32dp"
-            android:text="Misollar: “Jasur” → “Eshitaman” → “Onamga qo‘ng‘iroq qil”, “Telegramni och”, “Telegram xabarlarini o‘qi”, “Fonarni yoq”, “Soat nechchi?”, yoki erkin AI savoli."
+            android:text="System Assistant rejimida Jasur doimiy mikrofon notification bilan osilib turmaydi. Standart yordamchi qilib tanlang va Samsung sozlamasida power tugmasini bosib ushlashni Digital assistant ga biriktiring."
             android:textColor="@color/jasur_muted"
             android:textSize="13sp" />
     </LinearLayout>
