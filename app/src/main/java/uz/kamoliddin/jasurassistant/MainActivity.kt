@@ -1,8 +1,6 @@
 package uz.kamoliddin.jasurassistant
 
 import android.Manifest
-import android.app.NotificationManager
-import android.app.role.RoleManager
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -37,10 +35,6 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { updateStatus() }
 
-    private val roleLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { updateStatus() }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -73,8 +67,10 @@ class MainActivity : AppCompatActivity() {
         apiKeyInput.setText(settingsManager.getApiKey())
         offlineSwitch.isChecked = settingsManager.offlinePreferred
         aiSwitch.isChecked = settingsManager.aiEnabled
-        callAnnounceSwitch.isChecked = settingsManager.callAnnounceEnabled
-        telegramSwitch.isChecked = settingsManager.telegramEnabled
+        callAnnounceSwitch.isChecked = false
+        telegramSwitch.isChecked = false
+        callAnnounceSwitch.isEnabled = false
+        telegramSwitch.isEnabled = false
     }
 
     private fun saveSettings(showToast: Boolean = true) {
@@ -85,8 +81,8 @@ class MainActivity : AppCompatActivity() {
         settingsManager.setApiKey(apiKeyInput.text.toString())
         settingsManager.offlinePreferred = offlineSwitch.isChecked
         settingsManager.aiEnabled = aiSwitch.isChecked
-        settingsManager.callAnnounceEnabled = callAnnounceSwitch.isChecked
-        settingsManager.telegramEnabled = telegramSwitch.isChecked
+        settingsManager.callAnnounceEnabled = false
+        settingsManager.telegramEnabled = false
         if (showToast) toast("Sozlamalar saqlandi")
     }
 
@@ -112,12 +108,14 @@ class MainActivity : AppCompatActivity() {
         }
         findViewById<Button>(R.id.permissionsButton).setOnClickListener { requestRuntimePermissions() }
         findViewById<Button>(R.id.notificationAccessButton).setOnClickListener {
-            startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            toast("Safe buildda Telegram Notification Access o'chirilgan")
         }
         findViewById<Button>(R.id.batteryButton).setOnClickListener {
             startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
         }
-        findViewById<Button>(R.id.callRoleButton).setOnClickListener { requestCallScreeningRole() }
+        findViewById<Button>(R.id.callRoleButton).setOnClickListener {
+            toast("Safe buildda Call Screening o'chirilgan")
+        }
         findViewById<Button>(R.id.testAiButton).setOnClickListener {
             saveSettings(showToast = false)
             testAi()
@@ -128,28 +126,10 @@ class MainActivity : AppCompatActivity() {
         val permissions = mutableListOf(
             Manifest.permission.RECORD_AUDIO,
             Manifest.permission.READ_CONTACTS,
-            Manifest.permission.CALL_PHONE,
             Manifest.permission.CAMERA
         )
         if (Build.VERSION.SDK_INT >= 33) permissions += Manifest.permission.POST_NOTIFICATIONS
         permissionsLauncher.launch(permissions.toTypedArray())
-    }
-
-    private fun requestCallScreeningRole() {
-        if (Build.VERSION.SDK_INT < 29) {
-            toast("Call Screening roli Android 10+ uchun")
-            return
-        }
-        val roleManager = getSystemService(RoleManager::class.java)
-        if (!roleManager.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING)) {
-            toast("Bu telefonda Call Screening roli mavjud emas")
-            return
-        }
-        if (roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
-            toast("Caller ID roli allaqachon yoqilgan")
-            return
-        }
-        roleLauncher.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING))
     }
 
     private fun testAi() {
@@ -174,28 +154,12 @@ class MainActivity : AppCompatActivity() {
         statusText.text = if (running) "● Ishlayapti" else "● To‘xtatilgan"
         val mic = if (hasPermission(Manifest.permission.RECORD_AUDIO)) "mikrofon ✓" else "mikrofon ✗"
         val contacts = if (hasPermission(Manifest.permission.READ_CONTACTS)) "kontakt ✓" else "kontakt ✗"
-        val call = if (hasPermission(Manifest.permission.CALL_PHONE)) "qo‘ng‘iroq ✓" else "qo‘ng‘iroq ✗"
-        val role = if (hasCallScreeningRole()) "caller ID ✓" else "caller ID ✗"
-        val notif = if (isNotificationAccessEnabled()) "Telegram access ✓" else "Telegram access ✗"
-        statusDetails.text = "$mic • $contacts • $call\n$role • $notif"
+        val camera = if (hasPermission(Manifest.permission.CAMERA)) "fonar ✓" else "fonar ✗"
+        statusDetails.text = "$mic • $contacts • $camera\nSafe build: Telegram access va Caller ID o'chirilgan"
     }
 
     private fun hasPermission(permission: String): Boolean =
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
-
-    private fun hasCallScreeningRole(): Boolean {
-        if (Build.VERSION.SDK_INT < 29) return false
-        val roleManager = getSystemService(RoleManager::class.java)
-        return roleManager.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING) &&
-            roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)
-    }
-
-    private fun isNotificationAccessEnabled(): Boolean {
-        val manager = getSystemService(NotificationManager::class.java)
-        return manager.isNotificationListenerAccessGranted(
-            android.content.ComponentName(this, TelegramNotificationListener::class.java)
-        )
-    }
 
     private fun toast(message: String) = Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
