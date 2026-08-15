@@ -11,8 +11,8 @@ android {
         applicationId = "uz.kamoliddin.jasurassistant"
         minSdk = 29
         targetSdk = 35
-        versionCode = 120
-        versionName = "1.2.0-vosk"
+        versionCode = 200
+        versionName = "2.0.0-system-assistant"
     }
 
     buildTypes {
