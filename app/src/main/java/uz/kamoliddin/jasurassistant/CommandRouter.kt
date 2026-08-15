@@ -37,10 +37,7 @@ class CommandRouter(private val context: Context) {
 
         if (text.contains("telegram") && (text.contains("xabar") || text.contains("habar")) &&
             (text.contains("o'qi") || text.contains("oqi") || text.contains("ayt"))) {
-            val items = TelegramMessageStore(context).getRecent(5)
-            if (items.isEmpty()) return CommandResult("Yangi Telegram xabarlari topilmadi")
-            val speech = items.joinToString(". ") { "${it.sender} dan: ${it.text}" }
-            return CommandResult(speech)
+            return CommandResult("Safe versiyada Telegram xabarlarini o'qish vaqtincha o'chirilgan")
         }
 
         if ((text.contains("och") || text.contains("ishga tushir")) && !text.contains("qo'ng'iroq")) {
@@ -67,12 +64,8 @@ class CommandRouter(private val context: Context) {
             val contact = contacts.findByName(name)
                 ?: return CommandResult("$name nomli kontaktni topolmadim")
             val uri = Uri.parse("tel:${Uri.encode(contact.number)}")
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                context.startActivity(Intent(Intent.ACTION_CALL, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                return CommandResult("${contact.name} ga qo'ng'iroq qilyapman")
-            }
             context.startActivity(Intent(Intent.ACTION_DIAL, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            return CommandResult("Qo'ng'iroq ruxsati berilmagan. Raqam terish oynasini ochdim")
+            return CommandResult("${contact.name} raqamini terish oynasini ochdim")
         }
 
         if (text.contains("sozlamalarni och")) {
