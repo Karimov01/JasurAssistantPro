@@ -1,11 +1,12 @@
 package uz.kamoliddin.jasurassistant
 
 import android.Manifest
+import android.app.role.RoleManager
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
+import android.speech.RecognitionService
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
@@ -14,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import android.service.voice.VoiceInteractionService
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
@@ -33,6 +35,10 @@ class MainActivity : AppCompatActivity() {
 
     private val permissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
+    ) { updateStatus() }
+
+    private val assistantRoleLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
     ) { updateStatus() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,31 +96,27 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.saveButton).setOnClickListener { saveSettings() }
         findViewById<Button>(R.id.startButton).setOnClickListener {
             saveSettings(showToast = false)
-            if (!hasPermission(Manifest.permission.RECORD_AUDIO)) {
-                requestRuntimePermissions()
-                toast("Avval mikrofon ruxsatini bering")
-                return@setOnClickListener
-            }
-            val intent = Intent(this, VoiceForegroundService::class.java).setAction(VoiceForegroundService.ACTION_START)
-            ContextCompat.startForegroundService(this, intent)
-            settingsManager.assistantRunning = true
-            updateStatus()
-            toast("Jasur ishga tushdi")
+            requestAssistantRole()
         }
         findViewById<Button>(R.id.stopButton).setOnClickListener {
-            startService(Intent(this, VoiceForegroundService::class.java).setAction(VoiceForegroundService.ACTION_STOP))
-            settingsManager.assistantRunning = false
-            updateStatus()
+            if (!isJasurActiveAssistant()) {
+                toast("Avval Jasurni standart yordamchi sifatida tanlang")
+                requestAssistantRole()
+                return@setOnClickListener
+            }
+            try {
+                startActivity(Intent(Intent.ACTION_ASSIST))
+            } catch (_: Exception) {
+                toast("Power tugmasini bosib ushlab Jasurni chaqirib ko‘ring")
+            }
         }
         findViewById<Button>(R.id.permissionsButton).setOnClickListener { requestRuntimePermissions() }
+        findViewById<Button>(R.id.callRoleButton).setOnClickListener { requestAssistantRole() }
         findViewById<Button>(R.id.notificationAccessButton).setOnClickListener {
-            toast("Safe buildda Telegram Notification Access o'chirilgan")
+            toast("System Assistant rejimida doimiy notification kerak emas")
         }
         findViewById<Button>(R.id.batteryButton).setOnClickListener {
-            startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
-        }
-        findViewById<Button>(R.id.callRoleButton).setOnClickListener {
-            toast("Safe buildda Call Screening o'chirilgan")
+            toast("System Assistant rejimi doimiy mikrofon foreground service ishlatmaydi")
         }
         findViewById<Button>(R.id.testAiButton).setOnClickListener {
             saveSettings(showToast = false)
@@ -122,14 +124,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun requestAssistantRole() {
+        val roleManager = getSystemService(RoleManager::class.java)
+        if (!roleManager.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) {
+            toast("Bu Android qurilmada Assistant roli mavjud emas")
+            return
+        }
+        if (roleManager.isRoleHeld(RoleManager.ROLE_ASSISTANT)) {
+            toast("Jasur allaqachon standart yordamchi")
+            updateStatus()
+            return
+        }
+        assistantRoleLauncher.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT))
+    }
+
     private fun requestRuntimePermissions() {
-        val permissions = mutableListOf(
-            Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.READ_CONTACTS,
-            Manifest.permission.CAMERA
+        permissionsLauncher.launch(
+            arrayOf(
+                Manifest.permission.RECORD_AUDIO,
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.CAMERA
+            )
         )
-        if (Build.VERSION.SDK_INT >= 33) permissions += Manifest.permission.POST_NOTIFICATIONS
-        permissionsLauncher.launch(permissions.toTypedArray())
     }
 
     private fun testAi() {
@@ -150,12 +166,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateStatus() {
-        val running = settingsManager.assistantRunning
-        statusText.text = if (running) "● Ishlayapti" else "● To‘xtatilgan"
+        val active = isJasurActiveAssistant()
+        statusText.text = if (active) "● System Assistant faol" else "● Assistant sifatida tanlanmagan"
         val mic = if (hasPermission(Manifest.permission.RECORD_AUDIO)) "mikrofon ✓" else "mikrofon ✗"
         val contacts = if (hasPermission(Manifest.permission.READ_CONTACTS)) "kontakt ✓" else "kontakt ✗"
         val camera = if (hasPermission(Manifest.permission.CAMERA)) "fonar ✓" else "fonar ✗"
-        statusDetails.text = "$mic • $contacts • $camera\nSafe build: Telegram access va Caller ID o'chirilgan"
+        statusDetails.text = if (active) {
+            "$mic • $contacts • $camera\nNotification yo‘q. Power/assistant gesture bilan Jasurni chaqiring."
+        } else {
+            "$mic • $contacts • $camera\n“Ishga tushirish” orqali Jasurni standart yordamchi qiling."
+        }
+    }
+
+    private fun isJasurActiveAssistant(): Boolean {
+        val component = ComponentName(this, JasurVoiceInteractionService::class.java)
+        return VoiceInteractionService.isActiveService(this, component)
     }
 
     private fun hasPermission(permission: String): Boolean =
