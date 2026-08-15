@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.provider.Settings
+import android.service.voice.VoiceInteractionService
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
@@ -15,7 +16,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import android.service.voice.VoiceInteractionService
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
@@ -36,16 +36,6 @@ class MainActivity : AppCompatActivity() {
     private val permissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { updateStatus() }
-
-    private val assistantRoleLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) {
-        updateStatus()
-        if (!isJasurActiveAssistant()) {
-            openDefaultAppsSettings()
-            toast("Default apps ichidan 'Digital assistant app' ni ochib Jasur Assistant ni tanlang")
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,14 +90,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun wireActions() {
         findViewById<Button>(R.id.saveButton).setOnClickListener { saveSettings() }
+
         findViewById<Button>(R.id.startButton).setOnClickListener {
             saveSettings(showToast = false)
-            requestAssistantRole()
+            if (isJasurActiveAssistant()) {
+                toast("Jasur allaqachon standart yordamchi")
+                updateStatus()
+            } else {
+                openDefaultAppsSettings()
+            }
         }
+
         findViewById<Button>(R.id.stopButton).setOnClickListener {
             if (!isJasurActiveAssistant()) {
-                toast("Avval Jasurni standart yordamchi sifatida tanlang")
                 openDefaultAppsSettings()
+                toast("Default apps → Digital assistant app → Jasur Assistant ni tanlang")
                 return@setOnClickListener
             }
             try {
@@ -116,6 +113,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, AssistActivity::class.java))
             }
         }
+
         findViewById<Button>(R.id.permissionsButton).setOnClickListener { requestRuntimePermissions() }
         findViewById<Button>(R.id.callRoleButton).setOnClickListener { openDefaultAppsSettings() }
         findViewById<Button>(R.id.notificationAccessButton).setOnClickListener {
@@ -130,29 +128,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestAssistantRole() {
-        val roleManager = getSystemService(RoleManager::class.java)
-        if (isJasurActiveAssistant()) {
-            toast("Jasur allaqachon standart yordamchi")
-            updateStatus()
-            return
-        }
-        if (roleManager.isRoleAvailable(RoleManager.ROLE_ASSISTANT)) {
+    private fun openDefaultAppsSettings() {
+        val candidates = listOf(
+            Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS),
+            Intent("android.settings.MANAGE_DEFAULT_APPS_SETTINGS"),
+            Intent("android.settings.VOICE_INPUT_SETTINGS"),
+            Intent(Settings.ACTION_APPLICATION_SETTINGS),
+            Intent(Settings.ACTION_SETTINGS)
+        )
+
+        for (intent in candidates) {
             try {
-                assistantRoleLauncher.launch(roleManager.createRequestRoleIntent(RoleManager.ROLE_ASSISTANT))
-                return
+                if (intent.resolveActivity(packageManager) != null) {
+                    startActivity(intent)
+                    toast("Apps → Choose default apps → Digital assistant app → Jasur Assistant")
+                    return
+                }
             } catch (_: Exception) { }
         }
-        openDefaultAppsSettings()
-        toast("Default apps → Digital assistant app → Jasur Assistant ni tanlang")
-    }
-
-    private fun openDefaultAppsSettings() {
-        try {
-            startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
-        } catch (_: Exception) {
-            startActivity(Intent(Settings.ACTION_SETTINGS))
-        }
+        toast("Sozlamalarni avtomatik ochib bo‘lmadi")
     }
 
     private fun requestRuntimePermissions() {
@@ -191,7 +185,7 @@ class MainActivity : AppCompatActivity() {
         statusDetails.text = if (active) {
             "$mic • $contacts • $camera\nNotification yo‘q. Power/assistant gesture bilan Jasurni chaqiring."
         } else {
-            "$mic • $contacts • $camera\nSamsung: Default apps → Digital assistant app → Jasur Assistant"
+            "$mic • $contacts • $camera\nSamsung: Apps → Choose default apps → Digital assistant app → Jasur Assistant"
         }
     }
 
