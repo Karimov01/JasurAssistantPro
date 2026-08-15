@@ -1,0 +1,9 @@
+<resources>
+    <color name="jasur_red">#E53935</color>
+    <color name="jasur_red_dark">#B71C1C</color>
+    <color name="jasur_bg">#0D0F12</color>
+    <color name="jasur_panel">#171A1F</color>
+    <color name="jasur_text">#F5F7FA</color>
+    <color name="jasur_muted">#AAB2BD</color>
+    <color name="jasur_green">#33D17A</color>
+</resources>
