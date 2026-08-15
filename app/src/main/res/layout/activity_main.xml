@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/jasur_bg"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="JASUR"
+            android:textColor="@color/jasur_text"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:text="Shaxsiy ovozli AI yordamchi"
+            android:textColor="@color/jasur_muted"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/panel"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/statusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="● To‘xtatilgan"
+                android:textColor="@color/jasur_muted"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/statusDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Jasur hozir tinglamayapti"
+                android:textColor="@color/jasur_muted" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/startButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Ishga tushirish" />
+
+                <Button
+                    android:id="@+id/stopButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="To‘xtatish" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="SOZLAMALAR"
+            android:textColor="@color/jasur_muted"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/panel"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/wakeWordInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Wake word: Jasur"
+                android:inputType="text"
+                android:textColor="@color/jasur_text"
+                android:textColorHint="@color/jasur_muted" />
+
+            <EditText
+                android:id="@+id/languageInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Til kodi: uz-UZ"
+                android:inputType="text"
+                android:textColor="@color/jasur_text"
+                android:textColorHint="@color/jasur_muted" />
+
+            <Switch
+                android:id="@+id/offlineSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Offline tanishni birinchi tanlash"
+                android:textColor="@color/jasur_text" />
+
+            <Switch
+                android:id="@+id/aiSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tushunilmagan buyruqlarni AI’ga yuborish"
+                android:textColor="@color/jasur_text" />
+
+            <Switch
+                android:id="@+id/callAnnounceSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Kiruvchi qo‘ng‘iroqlarni ovozli aytish"
+                android:textColor="@color/jasur_text" />
+
+            <Switch
+                android:id="@+id/telegramSwitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Telegram notification xabarlarini saqlash/o‘qish"
+                android:textColor="@color/jasur_text" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="ONLINE AI"
+            android:textColor="@color/jasur_muted"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/panel"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/apiKeyInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="API kalit (sk-...)"
+                android:inputType="textPassword"
+                android:textColor="@color/jasur_text"
+                android:textColorHint="@color/jasur_muted" />
+
+            <EditText
+                android:id="@+id/baseUrlInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="https://api.openai.com/v1/responses"
+                android:inputType="textUri"
+                android:textColor="@color/jasur_text"
+                android:textColorHint="@color/jasur_muted" />
+
+            <EditText
+                android:id="@+id/modelInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Model: gpt-5.6"
+                android:inputType="text"
+                android:textColor="@color/jasur_text"
+                android:textColorHint="@color/jasur_muted" />
+
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Sozlamalarni saqlash" />
+
+            <Button
+                android:id="@+id/testAiButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="AI ulanishini tekshirish" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="RUXSATLAR"
+            android:textColor="@color/jasur_muted"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/panel"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/permissionsButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mikrofon / Kontakt / Qo‘ng‘iroq ruxsatlari" />
+
+            <Button
+                android:id="@+id/callRoleButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Caller ID / Call Screening rolini yoqish" />
+
+            <Button
+                android:id="@+id/notificationAccessButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Telegram uchun Notification Access" />
+
+            <Button
+                android:id="@+id/batteryButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Battery optimization sozlamasi" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="32dp"
+            android:text="Misollar: “Jasur” → “Eshitaman” → “Onamga qo‘ng‘iroq qil”, “Telegramni och”, “Telegram xabarlarini o‘qi”, “Fonarni yoq”, “Soat nechchi?”, yoki erkin AI savoli."
+            android:textColor="@color/jasur_muted"
+            android:textSize="13sp" />
+    </LinearLayout>
+</ScrollView>
