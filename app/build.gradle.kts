@@ -11,8 +11,8 @@ android {
         applicationId = "uz.kamoliddin.jasurassistant"
         minSdk = 29
         targetSdk = 35
-        versionCode = 110
-        versionName = "1.1.0-safe"
+        versionCode = 120
+        versionName = "1.2.0-vosk"
     }
 
     buildTypes {
@@ -38,4 +38,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
     implementation("com.google.android.material:material:1.12.0")
+    implementation("net.java.dev.jna:jna:5.18.1@aar")
+    implementation("com.alphacephei:vosk-android:0.3.75@aar")
 }
