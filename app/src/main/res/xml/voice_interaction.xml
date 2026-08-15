@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <voice-interaction-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:sessionService="uz.kamoliddin.jasurassistant.JasurVoiceInteractionSessionService"
+    android:recognitionService="uz.kamoliddin.jasurassistant.JasurRecognitionService"
     android:settingsActivity="uz.kamoliddin.jasurassistant.MainActivity"
     android:supportsAssist="true"
     android:supportsLocalInteraction="true"
