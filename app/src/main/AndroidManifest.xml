@@ -28,12 +28,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
 
         <service
             android:name=".JasurVoiceInteractionService"
             android:label="Jasur Assistant"
             android:permission="android.permission.BIND_VOICE_INTERACTION"
+            android:process=":interactor"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.service.voice.VoiceInteractionService" />
@@ -48,6 +53,19 @@
             android:permission="android.permission.BIND_VOICE_INTERACTION"
             android:process=":session"
             android:exported="true" />
+
+        <service
+            android:name=".JasurRecognitionService"
+            android:label="Jasur Offline Ovoz Tanish"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.speech.RecognitionService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.speech"
+                android:resource="@xml/recognizer" />
+        </service>
 
     </application>
 </manifest>
